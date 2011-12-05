@@ -25,7 +25,7 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-//#include "pwm.c"
+#include "pwm.c"
 #include "uart.c"
 #include "rc5.c"
 

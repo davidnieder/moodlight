@@ -8,7 +8,7 @@ volatile struct pwm_time_measuring_t pwm_actual_time;
 struct pwm_last_fading_step_t pwm_last_fading_step;
 struct pwm_fading_controll_t pwm_fading_controll;
 
-const uint8_t pwm_timeslot_table[32] = {
+const uint8_t pwm_timeslot_table[32] PROGMEM = {
                                  0,   1,   2,   3,   4,   5,
                                  6,   7,   8,   9,  10,  11,
                                 12,  13,  14,  16,  19,  23,
@@ -119,7 +119,7 @@ uint8_t pwm_is_time_for_next_fading_step(char channel) {
     return FALSE;
 }
 
-/* prepare pwm_fading_steps_t for next fading step */
+/* prepare pwm_fading_steps for next fading step */
 void pwm_update_fading_controll(char channel)   {
     if( channel == red_channel_id ) {
     

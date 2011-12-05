@@ -28,7 +28,7 @@ struct pwm_last_fading_step_t  {
 /* holds all information needed for the next step */
 struct pwm_fading_steps_t   {
     int16_t next_step_summand;
-    int16_t fading_rules_position;
+    uint16_t fading_rules_position;
     struct  pwm_time_measuring_t next_step_time;
 };
 
