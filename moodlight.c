@@ -14,18 +14,11 @@ int main(void)
 
     uart_init();
     rc5_init();
-//    pwm_init();
+    pwm_init();
 
+    uart_puts("init\n");
 
     sei();
-
-    uart_puts("sei\n");
-    uart_puts("rc5\n");
-    uart_puts("sei\n");
-    uart_puts("ies\n");
-    uart_puts("rc5\n");
-    uart_puts("sei\n");
-    uart_puts("laenger\n");
 
     while (TRUE)    {
 
@@ -44,7 +37,7 @@ int main(void)
             rc5_data = 0;
         }
 
-//        pwm_fading_engine();
+        pwm_fading_engine();
     }
 }
 
