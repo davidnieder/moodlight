@@ -2,7 +2,7 @@
 #define UART_H
 
 #ifndef PWM_H
-//#include "pwm.h"
+#include "pwm.h"
 #endif
 
 #ifndef F_CPU

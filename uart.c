@@ -9,7 +9,7 @@ void uart_init(void)
     UBRRH = (UART_BAUDRATE >> 8);
     UBRRL = UART_BAUDRATE;
     /* asynchronous mode, 8 bit character size, 1 stop bit, even parity */
-    UCSRC = (1<<UPM1) | (1<<UCSZ1) | (1<<UCSZ0);
+    UCSRC = (1<<URSEL) | (1<<UPM1) | (1<<UCSZ1) | (1<<UCSZ0);
     /* enable uart receiver, transmitter and receive interrupt */
     UCSRB |= (1<<RXEN) | (1<<TXEN) | (1<<RXCIE);
 }
@@ -45,7 +45,7 @@ void uart_handler(void)
             if( uart_received_string[3] >= '0' && uart_received_string[3] <= '9' )  {
                 value += (uart_received_string[3]-48);   }
 
-//            pwm_set_brightness(value, uart_received_string[1]);
+            pwm_set_brightness(value, uart_received_string[1]);
             uart_puts("ok\n");
         }
     }
@@ -53,16 +53,18 @@ void uart_handler(void)
 } 
 
 /* uart receive complete interrupt handler */
-ISR(USART_RX_vect)
+ISR(USART_RXC_vect)
 {
     uint8_t recv_char;
- 
-    /* get received char */
-    recv_char = UDR;
 
     /* parity check */
-    if( UCSRA & UPE )
+    if( UCSRA & PE )   {
+        recv_char = UDR;
         return;
+    }
+
+    /* get received char */
+    recv_char = UDR;
 
     /* if the last string was not read yet do not read a new character */
     if( !uart_string_received )   {

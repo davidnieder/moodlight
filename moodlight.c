@@ -24,8 +24,8 @@ int main(void)
 
         /* check for new uart data */
         if( uart_string_received )  {
-//            uart_handler();
-            uart_puts("ok\n");
+            uart_handler();
+//            uart_puts("ok\n");
             uart_string_received = FALSE;
         }
 
@@ -37,7 +37,7 @@ int main(void)
             rc5_data = 0;
         }
 
-        pwm_fading_engine();
+ //       pwm_fading_engine();
     }
 }
 

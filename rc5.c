@@ -6,8 +6,8 @@
 void rc5_init(void)
 {
     /* initialze timer/counter 0 */
-    TCCR0B |= (1<<CS02);    /* prescale 256 */
-    TIMSK  |= (1<<TOIE0);   /* enable counter0 overflow interrupt */
+    TCCR0 |= (1<<CS02);    /* prescaler 256 */
+    TIMSK |= (1<<TOIE0);   /* enable timer/counter0 overflow interrupt */
 
     count = 0;
 }
@@ -20,7 +20,6 @@ void rc5_handler(void)
 ISR (TIMER0_OVF_vect)
 {
   uint16_t tmp = rc5_tmp;				// for faster access
-
   TCNT0 = -2;					// 2 * 256 = 512 cycle
 
   if( ++rc5_time > PULSE_MAX ){			// count pulse time

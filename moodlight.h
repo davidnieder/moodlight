@@ -10,15 +10,15 @@
 #define TRUE  1
 #endif
 
-#define GREENLED  PB1
-#define REDLED    PB2
-#define BLUELED   PB3
+#define GREENLED  PC0
+#define REDLED    PC1
+#define BLUELED   PC2
 
-#define LEDPORT   PORTB
+#define LEDPORT   PORTC
 
-#define IRLED     PD6
+#define IRLED     PB5
 
-#define IRPIN     PIND
+#define IRPIN     PINB
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

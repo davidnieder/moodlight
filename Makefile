@@ -1,5 +1,5 @@
 # platform
-MCU = attiny2313
+MCU = atmega8
 # object format
 FORMAT = ihex
 # target name
