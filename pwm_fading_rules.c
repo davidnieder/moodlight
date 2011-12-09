@@ -3,7 +3,7 @@
 
 #define FADING_RULES_ARRAY_LENGTH 64
 
-const int8_t redchannel_fading_rules[FADING_RULES_ARRAY_LENGTH][4] PROGMEM = {
+const prog_int8_t redchannel_fading_rules[FADING_RULES_ARRAY_LENGTH][4] PROGMEM = {
                                                { 0, 1,  0,  0 },
                                                { 0, 1,  0,  0 },
                                                { 0, 1,  0,  0 },
@@ -74,6 +74,7 @@ const int8_t redchannel_fading_rules[FADING_RULES_ARRAY_LENGTH][4] PROGMEM = {
 
 
                                             };
+//const prog_int8_t (*fading_ptr)[4] = redchannel_fading_rules;
 
 const int8_t bluechannel_fading_rules[FADING_RULES_ARRAY_LENGTH][4] PROGMEM = {
                                                { 1, 0,  1,  0 },
