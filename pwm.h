@@ -32,7 +32,7 @@ struct pwm_fading_steps_t   {
     struct  pwm_time_measuring_t next_step_time;
 };
 
-/* encapsulate pwm_fading_steps_t for three channels */
+/* encapsulates pwm_fading_steps_t for three channels */
 struct pwm_fading_controll_t    {
     struct pwm_fading_steps_t redchannel,
         bluechannel, greenchannel;

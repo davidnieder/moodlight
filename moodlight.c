@@ -37,7 +37,7 @@ int main(void)
             rc5_data = 0;
         }
 
- //       pwm_fading_engine();
+        pwm_fading_engine();
     }
 }
 

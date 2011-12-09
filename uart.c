@@ -23,13 +23,34 @@ void uart_putc(unsigned char c)
     UDR = c;
 }
 
-void uart_puts (char *s)
+void uart_puts(char *s)
 {
     /* calling putc for every character in s */
     while (*s)  {
         uart_putc(*s);
         s++;
     }
+}
+
+void uart_puti(uint8_t value)
+{
+    char c_value[4];
+    if( value >= 100 )   {
+        c_value[0] = value / 100 + 48;
+        c_value[1] = value / 10 + 48;
+        c_value[2] = value % 10 + 48;
+        c_value[3] = '\0';
+    }
+    else if( value >= 10 )   {
+        c_value[0] = value / 10 + 48;
+        c_value[1] = value % 10 + 48;
+        c_value[2] = '\0';
+    }
+    else if( value < 10 )   {
+        c_value[0] = value + 48;
+        c_value[1] = '\0';
+    }
+    uart_puts(c_value);
 }
 
 void uart_handler(void)

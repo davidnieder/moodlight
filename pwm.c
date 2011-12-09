@@ -53,33 +53,33 @@ void pwm_init(void)
     pwm_fading_controll.redchannel.fading_rules_position = 0;
     pwm_fading_controll.redchannel.next_step_summand = pgm_read_byte(
         &redchannel_fading_rules[0][0]);
-    pwm_fading_controll.redchannel.next_step_time.milliseconds = pgm_read_byte(
-        &redchannel_fading_rules[0][3]);
-    pwm_fading_controll.redchannel.next_step_time.seconds = pgm_read_byte(
-        &redchannel_fading_rules[0][2]);
     pwm_fading_controll.redchannel.next_step_time.minutes = pgm_read_byte(
         &redchannel_fading_rules[0][1]);
-
+    pwm_fading_controll.redchannel.next_step_time.milliseconds = pgm_read_byte(
+        &redchannel_fading_rules[0][2]);
+    pwm_fading_controll.redchannel.next_step_time.milliseconds = pgm_read_byte(
+        &redchannel_fading_rules[0][3]) *5;
+ 
     pwm_fading_controll.bluechannel.fading_rules_position = 0;
     pwm_fading_controll.bluechannel.next_step_summand = pgm_read_byte(
         &bluechannel_fading_rules[0][0]);
-    pwm_fading_controll.bluechannel.next_step_time.milliseconds = pgm_read_byte(
-        &bluechannel_fading_rules[0][3]);
-    pwm_fading_controll.bluechannel.next_step_time.seconds = pgm_read_byte(
-        &bluechannel_fading_rules[0][2]);
     pwm_fading_controll.bluechannel.next_step_time.minutes = pgm_read_byte(
         &bluechannel_fading_rules[0][1]);
-
+    pwm_fading_controll.bluechannel.next_step_time.seconds = pgm_read_byte(
+        &bluechannel_fading_rules[0][2]);
+    pwm_fading_controll.bluechannel.next_step_time.milliseconds = pgm_read_byte(
+        &bluechannel_fading_rules[0][3]) *5;
+ 
     pwm_fading_controll.greenchannel.fading_rules_position = 0;
     pwm_fading_controll.greenchannel.next_step_summand = pgm_read_byte(
         &greenchannel_fading_rules[0][0]);
-    pwm_fading_controll.greenchannel.next_step_time.milliseconds = pgm_read_byte(
-        &greenchannel_fading_rules[0][3]);
-    pwm_fading_controll.greenchannel.next_step_time.seconds = pgm_read_byte(
-        &greenchannel_fading_rules[0][2]);
     pwm_fading_controll.greenchannel.next_step_time.minutes = pgm_read_byte(
         &greenchannel_fading_rules[0][1]);
-
+    pwm_fading_controll.greenchannel.next_step_time.seconds = pgm_read_byte(
+        &greenchannel_fading_rules[0][2]);
+    pwm_fading_controll.greenchannel.next_step_time.milliseconds = pgm_read_byte(
+        &greenchannel_fading_rules[0][3]) *5;
+ 
 }
 
 void pwm_set_brightness(uint8_t value, char channel)
@@ -106,9 +106,26 @@ void pwm_fading_engine(void)
             pwm_last_fading_step.redchannel = pwm_actual_time;
             pwm_fading_controll.redchannel.fading_rules_position++;
             pwm_update_fading_controll( red_channel_id );
+
+            uart_puts("redch: ");
+            uart_puti( pwm_brightness.redchannel );
+            uart_putc('\n');
+
+            uart_puts("pos: ");
+            uart_puti( pwm_fading_controll.redchannel.fading_rules_position );
+            uart_putc('\n');
+
+            uart_puts("actsec: ");
+            uart_puti( pwm_actual_time.seconds );
+            uart_putc('\n');
+
+            uart_puts("lasec: ");
+            uart_puti( pwm_last_fading_step.redchannel.seconds );
+            uart_putc('\n');
+            
         }
         /* blue channel */
-        if( pwm_is_time_for_next_fading_step( red_channel_id ) )   {
+        if( pwm_is_time_for_next_fading_step( blue_channel_id ) )   {
             pwm_set_brightness((pwm_brightness.bluechannel +
                                 pwm_fading_controll.bluechannel.next_step_summand),
                                 blue_channel_id );
@@ -119,7 +136,7 @@ void pwm_fading_engine(void)
         }
 
         /* green channel */
-        if( pwm_is_time_for_next_fading_step( red_channel_id ) )   {
+        if( pwm_is_time_for_next_fading_step( green_channel_id ) )   {
             pwm_set_brightness((pwm_brightness.greenchannel +
                                 pwm_fading_controll.greenchannel.next_step_summand),
                                 green_channel_id );
@@ -131,46 +148,107 @@ void pwm_fading_engine(void)
     }
 }
 
-/* checks if it is time for next fading step */
+/* checks if it is time for next fading step - ugly implemented */
 uint8_t pwm_is_time_for_next_fading_step(char channel) {
     if( channel == red_channel_id ) {
-        if( pwm_last_fading_step.redchannel.minutes +
-            pwm_fading_controll.redchannel.next_step_time.minutes <=
-            pwm_actual_time.minutes )   return TRUE;
-        if( pwm_last_fading_step.redchannel.seconds +
-            pwm_fading_controll.redchannel.next_step_time.seconds <=
-            pwm_actual_time.seconds ) return TRUE;
-        if( pwm_last_fading_step.redchannel.milliseconds +
-            pwm_fading_controll.redchannel.next_step_time.milliseconds <=
-            pwm_actual_time.milliseconds ) return TRUE;
+        if( pwm_fading_controll.redchannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.redchannel.next_step_time.seconds == 0 &&
+            pwm_fading_controll.redchannel.next_step_time.milliseconds +
+            pwm_last_fading_step.redchannel.milliseconds <=
+            pwm_actual_time.milliseconds )
 
-        return FALSE;
+            return TRUE;
+        else if(
+            pwm_fading_controll.redchannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.redchannel.next_step_time.seconds +
+            pwm_last_fading_step.redchannel.seconds + 1 <=
+            pwm_actual_time.seconds )
+
+            return TRUE;
+            if(
+            pwm_fading_controll.redchannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.redchannel.next_step_time.seconds +
+            pwm_last_fading_step.redchannel.seconds <=
+            pwm_actual_time.seconds &&
+            pwm_fading_controll.redchannel.next_step_time.milliseconds +
+            pwm_last_fading_step.redchannel.milliseconds <=
+            pwm_actual_time.milliseconds )
+
+            return TRUE;
+        else if(
+            pwm_fading_controll.redchannel.next_step_time.minutes +
+            pwm_last_fading_step.redchannel.minutes <=
+            pwm_actual_time.minutes &&
+            pwm_fading_controll.redchannel.next_step_time.seconds +
+            pwm_last_fading_step.redchannel.seconds <=
+            pwm_actual_time.seconds &&
+            pwm_fading_controll.redchannel.next_step_time.milliseconds +
+            pwm_last_fading_step.redchannel.milliseconds <=
+            pwm_actual_time.milliseconds )
+
+            return TRUE;
     }
-    else if( channel == blue_channel_id )   {
-        if( pwm_last_fading_step.bluechannel.minutes +
-            pwm_fading_controll.bluechannel.next_step_time.minutes <=
-            pwm_actual_time.minutes )   return TRUE;
-        if( pwm_last_fading_step.bluechannel.seconds +
-            pwm_fading_controll.bluechannel.next_step_time.seconds <=
-            pwm_actual_time.seconds ) return TRUE;
-        if( pwm_last_fading_step.bluechannel.milliseconds +
-            pwm_fading_controll.bluechannel.next_step_time.milliseconds <=
-            pwm_actual_time.milliseconds ) return TRUE;
+    else if( channel == blue_channel_id ) {
+        if( pwm_fading_controll.bluechannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.bluechannel.next_step_time.seconds == 0 &&
+            pwm_fading_controll.bluechannel.next_step_time.milliseconds +
+            pwm_last_fading_step.bluechannel.milliseconds <=
+            pwm_actual_time.milliseconds )
 
-        return FALSE;
+            return TRUE;
+        else if(
+            pwm_fading_controll.bluechannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.bluechannel.next_step_time.seconds +
+            pwm_last_fading_step.bluechannel.seconds <=
+            pwm_actual_time.seconds &&
+            pwm_fading_controll.bluechannel.next_step_time.milliseconds +
+            pwm_last_fading_step.bluechannel.milliseconds <=
+            pwm_actual_time.milliseconds )
+
+            return TRUE;
+        else if(
+            pwm_fading_controll.bluechannel.next_step_time.minutes +
+            pwm_last_fading_step.bluechannel.minutes <=
+            pwm_actual_time.minutes &&
+            pwm_fading_controll.bluechannel.next_step_time.seconds +
+            pwm_last_fading_step.bluechannel.seconds <=
+            pwm_actual_time.seconds &&
+            pwm_fading_controll.bluechannel.next_step_time.milliseconds +
+            pwm_last_fading_step.bluechannel.milliseconds <=
+            pwm_actual_time.milliseconds )
+
+            return TRUE;
     }
-    else if( channel == green_channel_id )  {
-        if( pwm_last_fading_step.greenchannel.minutes +
-            pwm_fading_controll.greenchannel.next_step_time.minutes <=
-            pwm_actual_time.minutes )   return TRUE;
-        if( pwm_last_fading_step.greenchannel.seconds +
-            pwm_fading_controll.greenchannel.next_step_time.seconds <=
-            pwm_actual_time.seconds ) return TRUE;
-        if( pwm_last_fading_step.greenchannel.milliseconds +
-            pwm_fading_controll.greenchannel.next_step_time.milliseconds <=
-            pwm_actual_time.milliseconds ) return TRUE;
+    else if( channel == green_channel_id ) {
+        if( pwm_fading_controll.greenchannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.greenchannel.next_step_time.seconds == 0 &&
+            pwm_fading_controll.greenchannel.next_step_time.milliseconds +
+            pwm_last_fading_step.greenchannel.milliseconds <=
+            pwm_actual_time.milliseconds )
 
-        return FALSE;
+            return TRUE;
+        else if(
+            pwm_fading_controll.greenchannel.next_step_time.minutes == 0 &&
+            pwm_fading_controll.greenchannel.next_step_time.seconds +
+            pwm_last_fading_step.greenchannel.seconds <=
+            pwm_actual_time.seconds &&
+            pwm_fading_controll.greenchannel.next_step_time.milliseconds +
+            pwm_last_fading_step.greenchannel.milliseconds <=
+            pwm_actual_time.milliseconds )
+
+            return TRUE;
+        else if(
+            pwm_fading_controll.greenchannel.next_step_time.minutes +
+            pwm_last_fading_step.greenchannel.minutes <=
+            pwm_actual_time.minutes &&
+            pwm_fading_controll.greenchannel.next_step_time.seconds +
+            pwm_last_fading_step.greenchannel.seconds <=
+            pwm_actual_time.seconds &&
+            pwm_fading_controll.greenchannel.next_step_time.milliseconds +
+            pwm_last_fading_step.greenchannel.milliseconds <=
+            pwm_actual_time.milliseconds )
+
+            return TRUE;
     }
     return FALSE;
 }
@@ -179,8 +257,9 @@ uint8_t pwm_is_time_for_next_fading_step(char channel) {
 void pwm_update_fading_controll(char channel)   {
     if( channel == red_channel_id ) {
         if( pwm_fading_controll.redchannel.fading_rules_position >=
-            FADING_RULES_ARRAY_LENGTH )
+            FADING_RULES_ARRAY_LENGTH ) {
             pwm_fading_controll.redchannel.fading_rules_position = 0;
+            uart_puts("update\n");    }
 
         pwm_fading_controll.redchannel.next_step_summand =
             pgm_read_byte( &redchannel_fading_rules
@@ -284,6 +363,14 @@ ISR(TIMER1_COMPB_vect)
     if( pwm_actual_time.seconds >= 60 )    {
         pwm_actual_time.seconds = 0;
         pwm_actual_time.minutes++;
+
+        if( pwm_last_fading_step.redchannel.seconds >= 59 )
+            pwm_last_fading_step.redchannel.seconds = 0;
+        if( pwm_last_fading_step.bluechannel.seconds >= 59 )
+            pwm_last_fading_step.bluechannel.seconds = 0;
+        if( pwm_last_fading_step.greenchannel.seconds >= 59 )
+            pwm_last_fading_step.greenchannel.seconds = 0;
+ 
     }
     if( pwm_actual_time.minutes == 255 ) {
         pwm_actual_time.minutes = 0;
