@@ -32,7 +32,7 @@ void uart_puts(char *s)
     }
 }
 
-void uart_puti(uint8_t value)
+void uart_putui(uint8_t value)
 {
     char c_value[4];
     if( value >= 100 )   {
@@ -53,7 +53,7 @@ void uart_puti(uint8_t value)
     uart_puts(c_value);
 }
 
-void uart_handler(void)
+void uart_protocol_handler(void)
 {
     if( uart_received_string[0] == 'p' )    {
 

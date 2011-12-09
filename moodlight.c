@@ -12,10 +12,12 @@ int main(void)
     /* turn LEDs off */
     PORTB &= ~( (1<<REDLED) | (1<<BLUELED) | (1<<GREENLED) );
 
+    /* initiate modules */
     uart_init();
     rc5_init();
     pwm_init();
 
+    /* send hello message */
     uart_puts("init\n");
 
     sei();
@@ -24,8 +26,7 @@ int main(void)
 
         /* check for new uart data */
         if( uart_string_received )  {
-            uart_handler();
-//            uart_puts("ok\n");
+            uart_protocol_handler();
             uart_string_received = FALSE;
         }
 
@@ -34,7 +35,7 @@ int main(void)
 //            rc5_handler();
             uart_puts("rc5 recv\n");
             _delay_ms(100);
-            rc5_data = 0;
+            rc5_data = FALSE;
         }
 
         pwm_fading_engine();

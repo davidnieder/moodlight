@@ -30,6 +30,7 @@ char uart_received_string[MAX_RX_STRING_LENGTH+1];
 void uart_init(void);
 void uart_putc(unsigned char);
 void uart_puts(char *);
-void uart_handler(void);
+void uart_putui(uint8_t);
+void uart_protocol_handler(void);
 
 #endif
