@@ -3,6 +3,13 @@
 
 #include "pwm_fading_rules.c"
 
+#ifndef F_CPU
+    #error pwm.h: F_CPU not defined
+#endif
+
+#define TICKS_PER_MILLISECOND   (F_CPU / 1000)
+#define TICKS_TO_NEXT_PWM_SYCLE (F_CPU / (256*100))
+
 /* holds the actuall brightness of each channel */
 struct pwm_brightness_t   {
     uint8_t redchannel;

@@ -21,8 +21,8 @@ void pwm_init(void)
 {
     /* initialize timer/counter 1 */
     TCCR1B |= (1<<CS10);                    /* no prescaling */
-    OCR1A   = 313;                          /* compare value - software pwm */
-    OCR1B   = 8000;                         /* compare value - time measuring */
+    OCR1A   = TICKS_TO_NEXT_PWM_SYCLE;      /* compare value - software pwm */
+    OCR1B   = TICKS_PER_MILLISECOND;        /* compare value - time measuring */
     TIMSK  |= (1<<OCIE1A) | (1<<OCIE1B);    /* enable compare interupt a and b */
 
     pwm_count = 0;
@@ -55,39 +55,51 @@ void pwm_init(void)
     pwm_fading_controll.redchannel.fading_rules_array = fading_rules; 
 
     pwm_fading_controll.redchannel.next_step_summand = pgm_read_byte(
-        &pwm_fading_controll.redchannel.fading_rules_array[0]);
+        &pwm_fading_controll.redchannel.fading_rules_array
+        [pwm_fading_controll.redchannel.fading_rules_position][0]);
     pwm_fading_controll.redchannel.next_step_time.minutes = pgm_read_byte(
-        &pwm_fading_controll.redchannel.fading_rules_array[1]);
+        &pwm_fading_controll.redchannel.fading_rules_array
+        [pwm_fading_controll.redchannel.fading_rules_position][1]);
     pwm_fading_controll.redchannel.next_step_time.milliseconds = pgm_read_byte(
-        &pwm_fading_controll.redchannel.fading_rules_array[2]);
+        &pwm_fading_controll.redchannel.fading_rules_array
+        [pwm_fading_controll.redchannel.fading_rules_position][2]);
     pwm_fading_controll.redchannel.next_step_time.milliseconds = pgm_read_byte(
-        &pwm_fading_controll.redchannel.fading_rules_array[3]) *5;
+        &pwm_fading_controll.redchannel.fading_rules_array
+        [pwm_fading_controll.redchannel.fading_rules_position][3]) *5;
 
     pwm_fading_controll.bluechannel.fading_rules_position = 21;
     pwm_fading_controll.bluechannel.fading_activated = TRUE;
     pwm_fading_controll.bluechannel.fading_rules_array = fading_rules;
 
     pwm_fading_controll.bluechannel.next_step_summand = pgm_read_byte(
-        &pwm_fading_controll.bluechannel.fading_rules_array[0]);
+        &pwm_fading_controll.bluechannel.fading_rules_array
+        [pwm_fading_controll.bluechannel.fading_rules_position][0]);
     pwm_fading_controll.bluechannel.next_step_time.minutes = pgm_read_byte(
-        &pwm_fading_controll.bluechannel.fading_rules_array[1]);
+        &pwm_fading_controll.bluechannel.fading_rules_array
+        [pwm_fading_controll.bluechannel.fading_rules_position][1]);
     pwm_fading_controll.bluechannel.next_step_time.seconds = pgm_read_byte(
-        &pwm_fading_controll.bluechannel.fading_rules_array[2]);
+        &pwm_fading_controll.bluechannel.fading_rules_array
+        [pwm_fading_controll.bluechannel.fading_rules_position][2]);
     pwm_fading_controll.bluechannel.next_step_time.milliseconds = pgm_read_byte(
-        &bluechannel_fading_rules[0][3]) *5;
+        &bluechannel_fading_rules
+        [pwm_fading_controll.bluechannel.fading_rules_position][3]) *5;
  
     pwm_fading_controll.greenchannel.fading_rules_position = 42;
     pwm_fading_controll.greenchannel.fading_activated = TRUE;
     pwm_fading_controll.greenchannel.fading_rules_array = fading_rules;
 
     pwm_fading_controll.greenchannel.next_step_summand = pgm_read_byte(
-        &pwm_fading_controll.greenchannel.fading_rules_array[0]);
+        &pwm_fading_controll.greenchannel.fading_rules_array
+        [pwm_fading_controll.greenchannel.fading_rules_position][0]);
     pwm_fading_controll.greenchannel.next_step_time.minutes = pgm_read_byte(
-        &pwm_fading_controll.greenchannel.fading_rules_array[1]);
+        &pwm_fading_controll.greenchannel.fading_rules_array
+        [pwm_fading_controll.greenchannel.fading_rules_position][1]);
     pwm_fading_controll.greenchannel.next_step_time.seconds = pgm_read_byte(
-        &pwm_fading_controll.greenchannel.fading_rules_array[2]);
+        &pwm_fading_controll.greenchannel.fading_rules_array
+        [pwm_fading_controll.greenchannel.fading_rules_position][2]);
     pwm_fading_controll.greenchannel.next_step_time.milliseconds = pgm_read_byte(
-        &pwm_fading_controll.greenchannel.fading_rules_array[3]) *5;
+        &pwm_fading_controll.greenchannel.fading_rules_array
+        [pwm_fading_controll.greenchannel.fading_rules_position][3]) *5;
 }
 
 void pwm_set_brightness(uint8_t value, char channel)
@@ -221,7 +233,7 @@ void pwm_trigger_fading(uint8_t trigger)
 /* timer1 compare a interrupt - software pwm */
 ISR(TIMER1_COMPA_vect)
 {
-    OCR1A += 313-1;
+    OCR1A += TICKS_TO_NEXT_PWM_SYCLE-1;
 
     uint8_t output = 0;
     pwm_count++;
@@ -250,7 +262,7 @@ ISR(TIMER1_COMPA_vect)
 /* timer1 compare b interrupt - time measuring */
 ISR(TIMER1_COMPB_vect)
 {
-    OCR1B += 8000-1;
+    OCR1B += TICKS_PER_MILLISECOND-1;
     pwm_actual_time.milliseconds++;
 
     if( pwm_actual_time.milliseconds >= 1000 )   {
@@ -261,6 +273,7 @@ ISR(TIMER1_COMPB_vect)
         pwm_actual_time.seconds = 0;
         pwm_actual_time.minutes++;
 
+        /* temporary implemented here */
         if( pwm_last_fading_step.redchannel.seconds >= 59 )
             pwm_last_fading_step.redchannel.seconds = 0;
         if( pwm_last_fading_step.bluechannel.seconds >= 59 )
