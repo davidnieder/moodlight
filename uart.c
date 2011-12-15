@@ -58,7 +58,12 @@ void uart_protocol_handler(void)
     if( uart_received_string[0] == 'p' )    {
 
         if( uart_received_string[1] == 'r' || uart_received_string[1] == 'b'  ||
-            uart_received_string[1] == 'g' )    {
+            uart_received_string[1] == 'g' || uart_received_string[1] == 't' )    {
+
+            if( uart_received_string[2] == 'f' )
+                pwm_trigger_fading(FALSE);
+            if( uart_received_string[2] == 't' )
+                pwm_trigger_fading(TRUE);
 
             uint8_t value = 0;
             if( uart_received_string[2] >= '0' && uart_received_string[2] <= '3' )  {

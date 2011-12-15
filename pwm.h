@@ -27,9 +27,10 @@ struct pwm_last_fading_step_t  {
 
 /* holds all information needed for the next step */
 struct pwm_fading_steps_t   {
-    int16_t next_step_summand;
+    int16_t  next_step_summand;
     uint16_t fading_rules_position;
-    struct  pwm_time_measuring_t next_step_time;
+    uint8_t  fading_activated;
+    struct   pwm_time_measuring_t next_step_time;
     const prog_int8_t (*fading_rules_array)[4];
 };
 
@@ -52,6 +53,7 @@ void pwm_set_brightness(uint8_t, char);
 void pwm_update_channels(void);
 void pwm_update_fading_controll(struct pwm_fading_steps_t*);
 void pwm_fading_engine(void);
+void pwm_trigger_fading(uint8_t);
 uint8_t pwm_is_time_for_next_fading_step(struct pwm_fading_steps_t*,
                                          struct pwm_time_measuring_t*);
 
