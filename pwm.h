@@ -1,6 +1,7 @@
 #ifndef PWM_H
 #define PWM_H
 
+#include "pwm_timeslots.c"
 #include "pwm_fading_rules.c"
 
 #ifndef F_CPU
